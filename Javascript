@@ -1,0 +1,123 @@
+function Start()
+{
+  /*Make your objects in the "Objects" array for it to work.*/
+  objects = 
+  [
+    thing = new rect(/*width*/10, /*height*/10, /*color*/'red', /*X*/10, /*Y*/10),
+  ];
+  /*You can set objects velocitys by typing "object.velocity = [velocity.x., velocity.y]"*/
+  thing.velocity = [1, 0];
+  /*You can change the Camera X and the Camera Y for whatever you want*/
+  /*Things will already stop moving if they collide*/
+}
+
+function Update()
+{
+  /*This is the game loop*/
+  /*Use "object.testCollision(object2)" to test collisions.*/
+  if(thing.testCollision(thing2))
+  {
+    thing.x -= 0.001;
+    alert('It Worked');
+  }
+}
+
+//Don't mess with stuff under this line. (Unless you want the chance to break it.)
+
+function startGame() 
+{
+  myGameArea.start();
+  Camera.start();
+  Start();
+}
+
+function updateGameArea() 
+{
+  myGameArea.clear();
+  Camera.update();
+  for (i = 0; i < objects.length; i += 1) 
+  {
+    objects[i].update();
+    for(m = 0; m < objects.length; m += 1)
+    {
+      if(objects[m] !== objects[i])
+      {
+        objects[i].testCollision(objects[m]);
+      }
+    }
+  }
+  Update();
+}
+
+var myGameArea = 
+{
+    canvas : document.createElement("canvas"),
+    start : function() 
+    {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        ctx = this.context;
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 20);        
+    },
+    clear : function() 
+    {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+var Camera = 
+{
+  start : function()
+  {
+    this.x = 0;
+    this.y = 0;
+    this.velocity = [0, 0];
+  },
+  update : function()
+  {
+    this.x += this.velocity[0];
+    this.y -= this.velocity[1];
+  }
+}
+
+class rect
+{
+  constructor(width, height, color, x, y)
+  {
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.velocity = [0, 0];
+    this.top = this.y;
+    this.bottem = this.y + this.height;
+    this.left = this.x;
+    this.right = this.x + this.width;
+    this.update = function()
+    {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.x - Camera.x, this.y + Camera.y, this.width, this.height);
+      this.x += this.velocity[0];
+      this.y -= this.velocity[1];
+    }
+    this.testCollision = function(other)
+    {
+      this.top = this.y;
+      this.bottem = this.y + this.height;
+      this.left = this.x;
+      this.right = this.x + this.width;
+      if ((this.bottem < other.top) || (this.top > other.bottom) || (this.right < other.left) || (this.left > other.right)) 
+      {
+        return false;
+      }else
+      {
+        this.velocity = [0, 0];
+        other.velocity = [0, 0];
+        return true;
+      }
+    }
+  }
+}
