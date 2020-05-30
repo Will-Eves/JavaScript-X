@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <div>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <style>
+        body {
+          background: white;
+          color: #323232;
+          font-weight: 300;
+          height: 100vh;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: Helvetica neue, roboto;
+        }
+
+        img {
+          width: 56px;
+          height: 48px;
+        }
+
+        h1 {
+          font-weight: 200;
+          font-style: 26px;
+          margin: 10px;
+        }
+
+        canvas {
+          border:10px solid black;
+          background-color: #f1f1f1;
+        }
+      </style>
+    </head>
+    <body onload="startGame()">
+    </body>
+    <script>
+      function Start()
+{
+   /*Make your objects in the "Objects" array for it to work.*/
+  objects = 
+  [
+    thing = new rect(/*width*/10, /*height*/10, /*color*/'red', /*X*/10, /*Y*/10),
+    thing2 = new rect(100, 100, 'Green', 100, 10)
+  ];
+  /*You can set objects velocitys by typing "object.velocity = [velocity.x., velocity.y]"*/
+  thing.velocity = [1, 0];
+  /*You can change the Camera X and the Camera Y for whatever you want*/
+}
+
+function Update()
+{
+  /*This is the game loop*/
+  /*Use "object.testCollision(object2)" to test collisions.*/
+  if(thing.testCollision(thing2))
+  {
+    thing.x -= 0.001;
+    alert('It Worked');
+  }
+  /*Things will already stop moving if they collide*/
+}
+
+//Don't mess with stuff under this line
+
+function startGame() 
+{
+  myGameArea.start();
+  Camera.start();
+  Start();
+}
+
+function updateGameArea() 
+{
+  myGameArea.clear();
+  Camera.update();
+  for (i = 0; i < objects.length; i += 1) 
+  {
+    objects[i].update();
+    for(m = 0; m < objects.length; m += 1)
+    {
+      if(objects[m] !== objects[i])
+      {
+        objects[i].testCollision(objects[m]);
+      }
+    }
+  }
+  Update();
+}
+
+var myGameArea = 
+{
+    canvas : document.createElement("canvas"),
+    start : function() 
+    {
+        this.canvas.width = 480;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        ctx = this.context;
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.interval = setInterval(updateGameArea, 20);        
+    },
+    clear : function() 
+    {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+var Camera = 
+{
+  start : function()
+  {
+    this.x = 0;
+    this.y = 0;
+    this.velocity = [0, 0];
+  },
+  update : function()
+  {
+    this.x += this.velocity[0];
+    this.y -= this.velocity[1];
+  }
+}
+
+class rect
+{
+  constructor(width, height, color, x, y)
+  {
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.x = x;
+    this.y = y;
+    this.velocity = [0, 0];
+    this.top = this.y;
+    this.bottem = this.y + this.height;
+    this.left = this.x;
+    this.right = this.x + this.width;
+    this.update = function()
+    {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.x - Camera.x, this.y + Camera.y, this.width, this.height);
+      this.x += this.velocity[0];
+      this.y -= this.velocity[1];
+    }
+    this.testCollision = function(other)
+    {
+      this.top = this.y;
+      this.bottem = this.y + this.height;
+      this.left = this.x;
+      this.right = this.x + this.width;
+      if ((this.bottem < other.top) || (this.top > other.bottom) || (this.right < other.left) || (this.left > other.right)) 
+      {
+        return false;
+      }else
+      {
+        this.velocity = [0, 0];
+        other.velocity = [0, 0];
+        return true;
+      }
+    }
+  }
+}
+    </script>
+  </div>
+<html>
